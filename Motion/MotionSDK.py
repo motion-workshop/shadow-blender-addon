@@ -198,6 +198,10 @@ class Client:
             return None
 
         try:
+            # Convert Python 3 strings to byte string.
+            if not isinstance(data, bytes):
+                data = data.encode("utf-8")
+
             length = len(data)
             message = struct.pack("!I" + str(length) + "s", length, data)
 
@@ -827,6 +831,9 @@ class LuaConsole:
             # an error code.
             data = self.__client.readData(time_out_second)
             if None != data and len(data) > 0:
+                if not isinstance(data, str):
+                    data = str(data, "utf-8")
+
                 code = ord(data[0])
                 if code >= self.Success and code <= self.Continue:
                     result_code = code
@@ -901,7 +908,7 @@ class LuaConsole:
                 return str(result)
 
         def __string_call(self, name, *arg_list):
-            lua_call = "=node." + str(name) + "("
+            lua_call = "=node.%s(" % name
 
             # Create a string valued argument list from a variable
             # length list of arguments. Note that this only supports
@@ -909,10 +916,10 @@ class LuaConsole:
             sep = ""
             for item in arg_list:
                 if isinstance(item, str):
-                    lua_call += "'".join(
-                        ("\\'").join(i for i in item.split("'")))
+                    lua_call += "%s%s" % (sep, "".join(
+                        ["'", ("\\'").join(i for i in item.split("'")), "'"]))
                 else:
-                    lua_call += sep + str(float(item))
+                    lua_call += "%s%s" % (sep, float(item))
                 sep = ", "
 
             lua_call += ")"
@@ -969,19 +976,19 @@ def main():
         "   print('Failed to start reading')" \
         " end"
 
-    sys.stdout.write(LuaConsole.SendChunk(lua_client, lua_chunk, 5))
+    print(LuaConsole.SendChunk(lua_client, lua_chunk, 5))
 
     # Scripting language compatibility class. Translate
     # Python calls into Lua calls and send them to the
     # console service.
     if sys.version_info >= (2, 5):
         node = LuaConsole.Node(lua_client)
-        sys.stdout.write(node.is_reading())
+        print(node.is_reading())
 
     # Connect to the Preview data service.
     # Print out the Euler angle orientation output.
     client = Client(Host, PortPreview)
-    sys.stdout.write("Connected to " + str(Host) + ":" + str(PortPreview))
+    print("Connected to %s:%d" % (Host, PortPreview))
 
     if client.waitForData():
         sample_count = 0
@@ -990,14 +997,16 @@ def main():
 
             preview = Format.Preview(data)
             if len(preview) > 0:
-                sys.stdout.write("Euler = " + str(preview[1].getEuler()))
+                for item in preview.values():
+                    print("Euler = %s" % str(item.getEuler()))
+                    break
             else:
                 break
 
             sample_count += 1
 
     else:
-        sys.stdout.write("No current data available, giving up")
+        print("No current data available, giving up")
 
     client.close()
 
