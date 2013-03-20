@@ -1,5 +1,5 @@
 #
-# @file    tools/plugin/blender/__init__.py
+# @file    tools/plugin/blender/Motion/__init__.py
 # @author  Luke Tokheim, luke@motionnode.com
 # @version 2.0
 #
@@ -28,14 +28,19 @@ bl_info = {
 }
 
 from .mDevice import ModalOperator
+from .mPanel import LuaOperator, ShadowPanel
 
 import bpy
 
 def register():
     bpy.utils.register_class(ModalOperator)
+    bpy.utils.register_class(LuaOperator)
+    bpy.utils.register_class(ShadowPanel)
 
 def unregister():
     bpy.utils.unregister_class(ModalOperator)
+    bpy.utils.unregister_class(LuaOperator)
+    bpy.utils.unregister_class(ShadowPanel)
 
 if __name__ == "__main__":
     register()

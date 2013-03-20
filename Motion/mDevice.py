@@ -1,5 +1,5 @@
 #
-# @file    tools/plugin/blender/mDevice.py
+# @file    tools/plugin/blender/Motion/mDevice.py
 # @author  Luke Tokheim, luke@motionnode.com
 # @version 2.0
 #

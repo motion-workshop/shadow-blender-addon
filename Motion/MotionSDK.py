@@ -856,11 +856,9 @@ class LuaConsole:
         if lua_console.Success == result_code:
             return result_string
         elif lua_console.Continue == result_code:
-            raise RuntimeError(
-                "Lua chunk incomplete: " + str(result_string))
+            raise RuntimeError("Lua chunk incomplete: %s" % result_string)
         else:
-            raise RuntimeError(
-                "Lua command chunk failed: " + str(result_string))
+            raise RuntimeError("Lua command chunk failed: %s" % result_string)
 
     SendChunk = staticmethod(__SendChunk)
 
@@ -951,8 +949,7 @@ def main():
             if None == data:
                 break
 
-            sys.stdout.write(
-                str(Format.SensorElement(data).getGyroscope()) + "\n")
+            print("%s\n" % str(Format.SensorElement(data).getGyroscope()))
 
     # Set the default host and port parameters. The SDK is
     # socket bases so any networked Motion Service is available.
