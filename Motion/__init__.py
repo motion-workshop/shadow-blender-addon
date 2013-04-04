@@ -28,18 +28,20 @@ bl_info = {
 }
 
 from .mDevice import ModalOperator
-from .mPanel import LuaOperator, ShadowPanel
+from .mPanel import LuaOperator, ImportOperator, ShadowPanel
 
 import bpy
 
 def register():
     bpy.utils.register_class(ModalOperator)
     bpy.utils.register_class(LuaOperator)
+    bpy.utils.register_class(ImportOperator)
     bpy.utils.register_class(ShadowPanel)
 
 def unregister():
     bpy.utils.unregister_class(ModalOperator)
     bpy.utils.unregister_class(LuaOperator)
+    bpy.utils.unregister_class(ImportOperator)
     bpy.utils.unregister_class(ShadowPanel)
 
 if __name__ == "__main__":

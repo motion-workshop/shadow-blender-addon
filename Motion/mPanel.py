@@ -48,6 +48,44 @@ class ShadowPanel(bpy.types.Panel):
         col.operator("motion.lua",
                      text="Stop Take").command = "stop_take"
 
+        col = self.layout.column(align=True)
+        col.operator("motion.import_take",
+                     text="Import Take")
+
+class LuaNode:
+    """
+    Container class for a static connection to the Lua console service.
+    """
+    # Static class members, MotionSDK.Client.
+    Client = None
+    Host = "127.0.0.1"
+    Port = 32075
+
+    def get_client(self):
+        """
+        Internal use. Return a LuaConsole scripting node to send remote
+        commands to the server.
+        """
+        if None == LuaNode.Client:
+            try:
+                LuaNode.Client = SDK.Client(LuaNode.Host, LuaNode.Port)
+
+                print("Connected to device server at \"%s\""
+                      % LuaNode.Host)
+            except:
+                LuaNode.Client = None
+                raise RuntimeError("Failed to connect device server at \"%s\""
+                                   % LuaNode.Host)
+
+        return LuaNode.Client
+
+    def get_node(self):
+        """
+        Internal use. Return a LuaConsole scripting node to send remote
+        commands to the server.
+        """
+        return SDK.LuaConsole.Node(self.get_client())
+
 class LuaOperator(bpy.types.Operator):
     """
     Generic wrapper for Lua calls to the Motion Service as a Blender Operator.
@@ -57,11 +95,6 @@ class LuaOperator(bpy.types.Operator):
     bl_idname = "motion.lua"
     bl_label = "Send a Lua command to the Motion Service"
     command = bpy.props.StringProperty()
-
-    # Static class member, MotionSDK.Client.
-    client = None
-    host = "127.0.0.1"
-    port = 32075
  
     def execute(self, context):
         """
@@ -70,34 +103,51 @@ class LuaOperator(bpy.types.Operator):
           bpy.ops.motion.lua('EXEC_DEFAULT', command="start_take")
         """
         if len(self.command) > 0:
-            node = self.__lua_node()
+            node = LuaNode().get_node()
             getattr(node, self.command)()
 
         return {'FINISHED'}
 
-    def __client(self):
-        """
-        Internal use. Return a LuaConsole scripting node to send remote
-        commands to the server.
-        """
-        if None == LuaOperator.client:
-            try:
-                LuaOperator.client = SDK.Client(LuaOperator.host,
-                                                LuaOperator.port)
+class ImportOperator(bpy.types.Operator):
+    """
+    Import the current take in the Motion Service into the Blender scene.
+    Includes automatic export to BVH.
+    """
+    bl_idname = "motion.import_take"
+    bl_label = "Import the most recent take from the Motion Service"
 
-                print("Connected to device server at \"%s\""
-                      % LuaOperator.host)
-            except:
-                LuaOperator.client = None
-                report('ERROR', "Failed to connect device server at \"%s\""
-                       % LuaOperator.host)
+    def execute(self, context):
+        node = LuaNode().get_node()
 
-        return LuaOperator.client
+        # Get the current take path name from the device server.
+        rc, rs = node.get_take_path()
 
-    def __lua_node(self):
-        """
-        Internal use. Return a LuaConsole scripting node to send remote
-        commands to the server.
-        """
-        return SDK.LuaConsole.Node(self.__client())
+        if rc:
+            # Remove whitespace. There is probably a newline at the end of
+            # printed results from the device server.
+            filename = ""
+            if rs:
+                filename = rs.strip()
 
+            # Replace the extension.
+            for ext in ["mTake", "xml"]:
+                if filename.endswith(ext):
+                    filename = filename[0:len(filename) - len(ext)] + "bvh"
+                    break
+
+            # Export the take from the device server to BVH interchange format.
+            rc, rs = node.export(filename)
+            if not rc:
+                raise RuntimeError("Device server failed to export take to"
+                                   " BVH: %s" % rs)
+
+            # Import the BVH armature and animation into the Blender scene.
+            if rc:
+                bpy.ops.import_anim.bvh('EXEC_DEFAULT', filepath=filename,
+                                        global_scale=0.1, use_fps_scale=True)
+
+                return {'FINISHED'}
+        else:
+            raise RuntimeError("No current take loaded in the Motion Service")
+
+        return {'CANCELLED'}
