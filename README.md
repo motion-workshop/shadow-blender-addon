@@ -1,4 +1,4 @@
-Motion Shadow for Blender
+Shadow for Blender
 =======
 
 Blender support for the Shadow motion capture system.
@@ -21,9 +21,16 @@ Usage
 1. Open the Shadow.blend scene file in Blender. This contains the Shadow skeleton
    model defined as a Blender armature.
 
-2. Enable the "Motion Shadow" add-on using the add-ons window.
+2. Enable the "Shadow" add-on using the add-ons window.
 
 3. Start streaming data from the Shadow motion capture system.
 
 4. Send the command "mDevice: Start Device" from Blender. This will start to update
    the scene with live preview data.
+
+
+Tutorial
+------
+
+Visit our site at http://www.motionshadow.com/help/tutorial/blender.html for a
+tutorial on using the Shadow motion capture system with Blender.

@@ -1,9 +1,9 @@
 #
-# @file    tools/plugin/blender/Motion/mPanel.py
-# @author  Luke Tokheim, luke@motionnode.com
+# @file    tools/plugin/blender/Shadow/mPanel.py
+# @author  Luke Tokheim, luke@motionshadow.com
 # @version 2.0
 #
-# (C) Copyright Motion Workshop 2013. All rights reserved.
+# (C) Copyright Motion Workshop 2014. All rights reserved.
 #
 # The coded instructions, statements, computer programs, and/or related
 # material (collectively the "Data") in these files contain unpublished
@@ -19,6 +19,7 @@
 
 import bpy
 from . import MotionSDK as SDK
+
 
 class ShadowPanel(bpy.types.Panel):
     """
@@ -51,6 +52,7 @@ class ShadowPanel(bpy.types.Panel):
         col = self.layout.column(align=True)
         col.operator("motion.import_take",
                      text="Import Take")
+
 
 class LuaNode:
     """
@@ -86,6 +88,7 @@ class LuaNode:
         """
         return SDK.LuaConsole.Node(self.get_client())
 
+
 class LuaOperator(bpy.types.Operator):
     """
     Generic wrapper for Lua calls to the Motion Service as a Blender Operator.
@@ -95,7 +98,7 @@ class LuaOperator(bpy.types.Operator):
     bl_idname = "motion.lua"
     bl_label = "Send a Lua command to the Motion Service"
     command = bpy.props.StringProperty()
- 
+
     def execute(self, context):
         """
         Send the Lua command store in self.command to the Motion Service. For
@@ -107,6 +110,7 @@ class LuaOperator(bpy.types.Operator):
             getattr(node, self.command)()
 
         return {'FINISHED'}
+
 
 class ImportOperator(bpy.types.Operator):
     """

@@ -1,9 +1,9 @@
 #
-# @file    tools/plugin/blender/Motion/__init__.py
-# @author  Luke Tokheim, luke@motionnode.com
+# @file    tools/plugin/blender/Shadow/__init__.py
+# @author  Luke Tokheim, luke@motionshadow.com
 # @version 2.0
 #
-# (C) Copyright Motion Workshop 2013. All rights reserved.
+# (C) Copyright Motion Workshop 2014. All rights reserved.
 #
 # The coded instructions, statements, computer programs, and/or related
 # material (collectively the "Data") in these files contain unpublished
@@ -18,11 +18,11 @@
 #
 
 bl_info = {
-    "name": "Motion Shadow",
+    "name": "Shadow",
     "author": "Luke Tokheim",
-    "version": (1, 0),
-    "description": "Stream animation data from the Motion Service into the"
-                   " Blender scene. Use MotionSDK to handle socket "
+    "version": (2, 0),
+    "description": "Stream Shadow animation data from the Motion Service into "
+                   "the Blender scene. Use MotionSDK to handle socket "
                    "communication.",
     "category": "Animation"
 }
@@ -32,11 +32,13 @@ from .mPanel import LuaOperator, ImportOperator, ShadowPanel
 
 import bpy
 
+
 def register():
     bpy.utils.register_class(ModalOperator)
     bpy.utils.register_class(LuaOperator)
     bpy.utils.register_class(ImportOperator)
     bpy.utils.register_class(ShadowPanel)
+
 
 def unregister():
     bpy.utils.unregister_class(ModalOperator)

@@ -1,9 +1,9 @@
 #
-# @file    tools/plugin/blender/Motion/mDevice.py
-# @author  Luke Tokheim, luke@motionnode.com
+# @file    tools/plugin/blender/Shadow/mDevice.py
+# @author  Luke Tokheim, luke@motionshadow.com
 # @version 2.0
 #
-# (C) Copyright Motion Workshop 2013. All rights reserved.
+# (C) Copyright Motion Workshop 2014. All rights reserved.
 #
 # The coded instructions, statements, computer programs, and/or related
 # material (collectively the "Data") in these files contain unpublished
@@ -18,12 +18,14 @@
 #
 
 import copy
+import os
 import threading
 from xml.etree.ElementTree import XML
 
 import bpy
 from mathutils import Quaternion, Vector
 from . import MotionSDK as SDK
+
 
 #
 # Motion SDK I/O thread. Blocks while reading samples over data stream.
@@ -58,7 +60,10 @@ class mDevice(threading.Thread):
         # Configurable data service. Only get every other frame (~50 Hz) and
         # request inactive dummy nodes as well.
         #   [Local quaternion, positional constraint]
-        xml = b"<configurable stride=\"2\" inactive=\"1\"><Lq/><c/></configurable>"
+        xml = (
+            b"<configurable stride=\"2\" inactive=\"1\">"
+            b"<Lq/><c/></configurable>"
+        )
         client.writeData(xml)
 
         while (True):
@@ -137,8 +142,14 @@ class ModalOperator(bpy.types.Operator):
     __device = None
     __timer = None
     __debug = False
+    __cancel_event = ['ESC']
 
     def __init__(self):
+        # Mac is hanging when you close the Blender window. Stop the sampling
+        # thread when the window leaves the foreground.
+        if 'nt' != os.name:
+            self.__cancel_event.append('WINDOW_DEACTIVATE')
+
         self.__device = mDevice()
         self.__device.start()
 
@@ -188,14 +199,14 @@ class ModalOperator(bpy.types.Operator):
         interval.
         """
         if self.__debug:
-            print("modal")
+            print("modal: %s" % event.type)
 
-        if 'ESC' == event.type:
+        if event.type in self.__cancel_event:
             return self.cancel(context)
 
         if 'TIMER' == event.type:
             data, xml = self.__device.get_data()
-        
+
             self.__parse_data(context, data, xml)
 
         return {'PASS_THROUGH'}
@@ -256,9 +267,6 @@ class ModalOperator(bpy.types.Operator):
             t = Vector((item.value(7), item.value(5), item.value(6)))
 
             if None != obj:
-                if self.__debug:
-                    print("Missing object named %s" % name)
-
                 if 'QUATERNION' == obj.rotation_mode:
                     obj.rotation_quaternion = q
                 else:
@@ -266,6 +274,8 @@ class ModalOperator(bpy.types.Operator):
 
                 if (None == armature) or name.startswith("Hips"):
                     obj.location = t
+            elif self.__debug:
+                print("Missing object named %s" % name)
 
             # World space marker. Joint position point cloud with weights.
             obj = context.scene.objects.get("_".join([name, "Marker"]))
@@ -282,9 +292,9 @@ class ModalOperator(bpy.types.Operator):
 
     def __parse_xml(self, xml):
         self.__name_map.clear()
-        
+
         tree = XML(xml)
-        
+
         # <node key="N" id="Name"> ... </node>
         list = tree.findall(".//node")
         for itr in list:

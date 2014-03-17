@@ -856,9 +856,11 @@ class LuaConsole:
         if lua_console.Success == result_code:
             return result_string
         elif lua_console.Continue == result_code:
-            raise RuntimeError("Lua chunk incomplete: %s" % result_string)
+            raise RuntimeError(
+                "Lua chunk incomplete: " + str(result_string))
         else:
-            raise RuntimeError("Lua command chunk failed: %s" % result_string)
+            raise RuntimeError(
+                "Lua command chunk failed: " + str(result_string))
 
     SendChunk = staticmethod(__SendChunk)
 
