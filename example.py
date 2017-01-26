@@ -9,9 +9,10 @@ import Motion.MotionSDK as SDK
 # Script node. Use just like the Lua "node" module. Connect to Lua console.
 node = SDK.LuaConsole.Node(SDK.Client("127.0.0.1", 32075))
 
-# Set up the configuration.
+# Set up the configuration. Clear everything out, re-scan, and start streaming.
 node.close()
-node.open("Shadow.mNode")
+node.erase()
+node.scan()
 node.start()
 
 # Create rest pose.
