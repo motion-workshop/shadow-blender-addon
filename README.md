@@ -10,7 +10,7 @@ The folder Motion in this repository is the Blender add-on. Copy the entire
 folder into your Blender installation or user folder. Refer to the Blender
 manual for more details.
 
-http://wiki.blender.org/index.php/Doc:2.6/Manual/Extensions/Python/Add-Ons
+https://docs.blender.org/manual/preferences/addons.html
 
 Note that you must copy the folder manually rather than using the Blender
 Add-Ons window. The window only supports installation of single file add-ons.
@@ -32,5 +32,5 @@ Usage
 Tutorial
 ------
 
-Visit our site at http://www.motionshadow.com/help/tutorial/blender.html for a
+Visit our site at https://www.motionshadow.com/blender-tutorial for a
 tutorial on using the Shadow motion capture system with Blender.
