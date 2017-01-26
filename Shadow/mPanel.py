@@ -1,9 +1,9 @@
 #
 # @file    tools/plugin/blender/Shadow/mPanel.py
 # @author  Luke Tokheim, luke@motionshadow.com
-# @version 2.0
+# @version 2.4
 #
-# (C) Copyright Motion Workshop 2014. All rights reserved.
+# (C) Copyright Motion Workshop 2016. All rights reserved.
 #
 # The coded instructions, statements, computer programs, and/or related
 # material (collectively the "Data") in these files contain unpublished
@@ -39,7 +39,7 @@ class ShadowPanel(bpy.types.Panel):
 
         col = self.layout.column(align=True)
         col.operator("motion.lua",
-                     text="Set Pose").command = "set_pose"
+                     text="Reset Position").command = "set_pose"
         col.operator("motion.lua",
                      text="Create Rest Pose").command = "set_pose_marker"
 
@@ -148,7 +148,8 @@ class ImportOperator(bpy.types.Operator):
             # Import the BVH armature and animation into the Blender scene.
             if rc:
                 bpy.ops.import_anim.bvh('EXEC_DEFAULT', filepath=filename,
-                                        global_scale=0.1, use_fps_scale=True)
+                                        global_scale=0.1, use_fps_scale=True,
+                                        axis_forward='X', axis_up='Y')
 
                 return {'FINISHED'}
         else:

@@ -1,9 +1,9 @@
 #
 # @file    tools/plugin/blender/Shadow/__init__.py
 # @author  Luke Tokheim, luke@motionshadow.com
-# @version 2.0
+# @version 2.4
 #
-# (C) Copyright Motion Workshop 2014. All rights reserved.
+# (C) Copyright Motion Workshop 2016. All rights reserved.
 #
 # The coded instructions, statements, computer programs, and/or related
 # material (collectively the "Data") in these files contain unpublished
@@ -20,7 +20,7 @@
 bl_info = {
     "name": "Shadow",
     "author": "Luke Tokheim",
-    "version": (2, 0),
+    "version": (2, 4),
     "description": "Stream Shadow animation data from the Motion Service into "
                    "the Blender scene. Use MotionSDK to handle socket "
                    "communication.",

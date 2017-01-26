@@ -1,9 +1,9 @@
 #
 # @file    tools/plugin/blender/Shadow/mDevice.py
 # @author  Luke Tokheim, luke@motionshadow.com
-# @version 2.0
+# @version 2.4
 #
-# (C) Copyright Motion Workshop 2014. All rights reserved.
+# (C) Copyright Motion Workshop 2016. All rights reserved.
 #
 # The coded instructions, statements, computer programs, and/or related
 # material (collectively the "Data") in these files contain unpublished
