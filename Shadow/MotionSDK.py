@@ -1,9 +1,9 @@
 #
 # @file    tools/sdk/python/MotionSDK.py
 # @author  Luke Tokheim, luke@motionnode.com
-# @version 2.4
+# @version 2.5
 #
-# Copyright (c) 2016, Motion Workshop
+# Copyright (c) 2017, Motion Workshop
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -68,12 +68,6 @@ class Client:
         s.connect((host, port))
 
         self.__socket = s
-
-        # Set the MSG_WAITALL flag if it exists for this platform
-        try:
-            self.__recv_flags |= socket.MSG_WAITALL
-        except AttributeError:
-            pass
 
         # Read the first message from the service. It is a
         # string description of the remote service.
@@ -186,9 +180,21 @@ class Client:
 
             # Parse the length field, read the raw data field.
             length = struct.unpack("!I", header)[0]
-            data = self.__socket.recv(length, self.__recv_flags)
-            if length != len(data):
-                return None
+
+            # Use one or more socket.recv calls to read the data payload.
+            data = b""
+            while True:
+                message = self.__socket.recv(
+                    length - len(data),
+                    self.__recv_flags)
+                if not message or 0 == len(message):
+                    return None
+
+                data += message
+                if len(data) == length:
+                    break
+                elif len(data) > length:
+                    return None
 
             return data
         except socket.timeout:

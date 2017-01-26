@@ -1,9 +1,9 @@
 #
 # @file    tools/plugin/blender/Shadow/mPanel.py
 # @author  Luke Tokheim, luke@motionshadow.com
-# @version 2.4
+# @version 2.5
 #
-# (C) Copyright Motion Workshop 2016. All rights reserved.
+# (C) Copyright Motion Workshop 2017. All rights reserved.
 #
 # The coded instructions, statements, computer programs, and/or related
 # material (collectively the "Data") in these files contain unpublished
