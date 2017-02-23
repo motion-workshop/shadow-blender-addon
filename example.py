@@ -4,7 +4,7 @@
 # Node class for convenient Python use.
 #
 
-import Motion.MotionSDK as SDK
+import Shadow.MotionSDK as SDK
 
 # Script node. Use just like the Lua "node" module. Connect to Lua console.
 node = SDK.LuaConsole.Node(SDK.Client("127.0.0.1", 32075))
