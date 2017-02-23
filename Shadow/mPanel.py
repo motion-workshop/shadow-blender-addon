@@ -68,7 +68,7 @@ class LuaNode:
         Internal use. Return a LuaConsole scripting node to send remote
         commands to the server.
         """
-        if None == LuaNode.Client:
+        if LuaNode.Client is None:
             try:
                 LuaNode.Client = SDK.Client(LuaNode.Host, LuaNode.Port)
 

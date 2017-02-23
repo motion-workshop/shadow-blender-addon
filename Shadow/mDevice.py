@@ -66,9 +66,9 @@ class mDevice(threading.Thread):
         )
         client.writeData(xml)
 
-        while (True):
+        while True:
             data = client.readData()
-            if None == data:
+            if data is None:
                 # Empty message. Could be a time out.
                 continue
 
@@ -157,7 +157,7 @@ class ModalOperator(bpy.types.Operator):
             print("START")
 
     def __del__(self):
-        if None != self.__device:
+        if self.__device is not None:
             self.__device.close()
             self.__device = None
 
@@ -215,7 +215,7 @@ class ModalOperator(bpy.types.Operator):
         if self.__debug:
             print("cancel")
 
-        if None != self.__timer:
+        if self.__timer is not None:
             context.window_manager.event_timer_remove(self.__timer)
             self.__timer = None
 
@@ -241,7 +241,7 @@ class ModalOperator(bpy.types.Operator):
         list = SDK.Format.Configurable(data)
         for key, item in list.items():
             name = self.__name_map.get(key)
-            if None == name:
+            if name is None:
                 continue
 
             # "Body" is the container node for a single skeleton.
@@ -249,12 +249,12 @@ class ModalOperator(bpy.types.Operator):
                 # Either work with independent objects or an armature with
                 # named bones.
                 obj = context.scene.objects.get(name)
-                if (None != obj) and ('ARMATURE' == obj.type):
+                if obj is not None and 'ARMATURE' == obj.type:
                     armature = obj
                 else:
                     armature = None
             else:
-                if None == armature:
+                if armature is None:
                     obj = context.scene.objects.get(name)
                 else:
                     obj = armature.pose.bones.get(name)
@@ -266,20 +266,20 @@ class ModalOperator(bpy.types.Operator):
             # Translate.
             t = Vector((item.value(7), item.value(5), item.value(6)))
 
-            if None != obj:
+            if obj is not None:
                 if 'QUATERNION' == obj.rotation_mode:
                     obj.rotation_quaternion = q
                 else:
                     obj.rotation_euler = q.to_euler(obj.rotation_mode)
 
-                if (None == armature) or name.startswith("Hips"):
+                if armature is None or name.startswith("Hips"):
                     obj.location = t
             elif self.__debug:
                 print("Missing object named %s" % name)
 
             # World space marker. Joint position point cloud with weights.
             obj = context.scene.objects.get("_".join([name, "Marker"]))
-            if None != obj:
+            if obj is not None:
                 obj.location = t
 
                 weight = item.value(4)
