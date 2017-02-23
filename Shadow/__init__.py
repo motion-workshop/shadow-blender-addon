@@ -17,9 +17,15 @@
 # with no claim as to its suitability for any purpose.
 #
 
+from .mDevice import ModalOperator
+from .mPanel import LuaOperator, ImportOperator, ShadowPanel
+from .mImportAnim import ImportAnimOperator
+
+import bpy
+
 bl_info = {
     "name": "Shadow",
-    "author": "Luke Tokheim",
+    "author": "Motion Workshop",
     "version": (2, 5),
     "description": "Stream Shadow animation data from the Motion Service into "
                    "the Blender scene. Use MotionSDK to handle socket "
@@ -27,10 +33,10 @@ bl_info = {
     "category": "Animation"
 }
 
-from .mDevice import ModalOperator
-from .mPanel import LuaOperator, ImportOperator, ShadowPanel
 
-import bpy
+def menu_func_import(self, context):
+    self.layout.operator(
+        ImportAnimOperator.bl_idname, text="Shadow Animation (.csv)")
 
 
 def register():
@@ -38,6 +44,9 @@ def register():
     bpy.utils.register_class(LuaOperator)
     bpy.utils.register_class(ImportOperator)
     bpy.utils.register_class(ShadowPanel)
+    bpy.utils.register_class(ImportAnimOperator)
+
+    bpy.types.INFO_MT_file_import.append(menu_func_import)
 
 
 def unregister():
@@ -45,6 +54,10 @@ def unregister():
     bpy.utils.unregister_class(LuaOperator)
     bpy.utils.unregister_class(ImportOperator)
     bpy.utils.unregister_class(ShadowPanel)
+    bpy.utils.unregister_class(ImportAnimOperator)
+
+    bpy.types.INFO_MT_file_import.remove(menu_func_import)
+
 
 if __name__ == "__main__":
     register()
