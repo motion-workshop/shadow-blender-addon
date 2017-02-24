@@ -192,6 +192,7 @@ class ImportAnimOperator(bpy.types.Operator, bpy_extras.io_utils.ImportHelper):
     bl_label = "Import Shadow Animation"
     bl_options = {'REGISTER', 'UNDO'}
 
+    filename_ext = ".csv"
     filter_glob = bpy.props.StringProperty(default="*.csv", options={'HIDDEN'})
 
     @classmethod

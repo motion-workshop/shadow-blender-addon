@@ -51,7 +51,7 @@ class ShadowPanel(bpy.types.Panel):
 
         col = self.layout.column(align=True)
         col.operator("motion.import_take",
-                     text="Import Take")
+                     text="Import Take").filetype = "csv"
 
 
 class LuaNode:
@@ -72,7 +72,7 @@ class LuaNode:
             try:
                 LuaNode.Client = SDK.Client(LuaNode.Host, LuaNode.Port)
 
-                print("Connected to device server at \"%s\""
+                print("Connected to Lua console on device server at \"%s\""
                       % LuaNode.Host)
             except:
                 LuaNode.Client = None
@@ -97,6 +97,7 @@ class LuaOperator(bpy.types.Operator):
     """
     bl_idname = "motion.lua"
     bl_label = "Send a Lua command to the Motion Service"
+
     command = bpy.props.StringProperty()
 
     def execute(self, context):
@@ -115,10 +116,12 @@ class LuaOperator(bpy.types.Operator):
 class ImportOperator(bpy.types.Operator):
     """
     Import the current take in the Motion Service into the Blender scene.
-    Includes automatic export to BVH.
+    Includes automatic export to BVH, CSV, or FBX as the interchange format.
     """
     bl_idname = "motion.import_take"
     bl_label = "Import the most recent take from the Motion Service"
+
+    filetype = bpy.props.StringProperty(default="csv")
 
     def execute(self, context):
         node = LuaNode().get_node()
@@ -129,27 +132,46 @@ class ImportOperator(bpy.types.Operator):
         if rc:
             # Remove whitespace. There is probably a newline at the end of
             # printed results from the device server.
-            filename = ""
+            filepath = ""
             if rs:
-                filename = rs.strip()
+                filepath = rs.strip()
 
             # Replace the extension.
             for ext in ["mTake", "xml"]:
-                if filename.endswith(ext):
-                    filename = filename[0:len(filename) - len(ext)] + "bvh"
+                if filepath.endswith(ext):
+                    filepath = "".join([filepath[0:len(filepath) - len(ext)],
+                                       self.filetype])
                     break
 
-            # Export the take from the device server to BVH interchange format.
-            rc, rs = node.export(filename)
+            # Export the take from the device server using the requested
+            # interchange format.
+            if "csv" == self.filetype:
+                rc, rs = node.export_stream(filepath)
+            elif "bvh" == self.filetype:
+                rc, rs = node.export(filepath)
+
             if not rc:
                 raise RuntimeError("Device server failed to export take to"
-                                   " BVH: %s" % rs)
+                                   " %s: %s" % (self.filetype, rs))
 
-            # Import the BVH armature and animation into the Blender scene.
+            # Import the animation into the Blender scene.
             if rc:
-                bpy.ops.import_anim.bvh('EXEC_DEFAULT', filepath=filename,
-                                        global_scale=0.1, use_fps_scale=True,
-                                        axis_forward='X', axis_up='Y')
+                if "csv" == self.filetype:
+                    bpy.ops.import_anim.shadow('EXEC_DEFAULT',
+                                               filepath=filepath)
+                elif "bvh" == self.filetype:
+                    bpy.ops.import_anim.bvh('EXEC_DEFAULT',
+                                            filepath=filepath,
+                                            global_scale=0.1,
+                                            use_fps_scale=True,
+                                            axis_forward='X',
+                                            axis_up='Y')
+                elif "fbx" == self.filetype:
+                    bpy.ops.import_scene.fbx('EXEC_DEFAULT',
+                                             filepath=filepath,
+                                             automatic_bone_orientation=True)
+                else:
+                    raise RuntimeError("No valid import file type selected")
 
                 return {'FINISHED'}
         else:
