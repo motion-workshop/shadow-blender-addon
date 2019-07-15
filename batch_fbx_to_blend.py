@@ -15,7 +15,7 @@ from pathlib import Path
 
 # Location prefix of the input FBX files.
 # Windows and macOS.
-p = Path.home() / Path("Documents/Motion/take/2019-07-09")
+p = Path.home() / Path("Documents/Motion/take")
 # Linux.
 #p = Path.home() / Path("Motion/take")
 
